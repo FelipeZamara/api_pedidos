@@ -1,68 +1,165 @@
-# CodeIgniter 4 Application Starter
+# API de Pedidos
 
-## What is CodeIgniter?
+## 📌 Sobre a API
+Esta API foi desenvolvida utilizando **CodeIgniter 4** e **MySQL** para gerenciar pedidos e seus produtos.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## 🛠 Tecnologias Utilizadas
+- **CodeIgniter 4** (Framework PHP)
+- **MySQL** (Banco de Dados)
+- **Composer** (Gerenciador de dependências)
+- **Postman / Insomnia** (Para testar a API)
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+## 🚀 Configuração Inicial
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+### 📂 Clonar o repositório
+```sh
+git clone https://github.com/FelipeZamara/api_pedidos.git
+cd api_pedidos
+```
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+### ⚙️ Instalar dependências
+```sh
+composer install
+```
 
-## Installation & updates
+### 🔧 Configurar o ambiente
+Renomeie o arquivo `.env.example` para `.env` e edite as configurações do banco de dados:
+```env
+database.default.hostname = localhost
+database.default.database = sua_base_de_dados
+database.default.username = seu_usuario
+database.default.password = 
+database.default.DBDriver = MySQLi
+```
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+### 🔄 Executar as migrações do banco de dados
+```sh
+php spark migrate
+```
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+### 🚀 Iniciar o servidor
+```sh
+php spark serve
+```
+A API estará acessível em `http://localhost:8080`
 
-## Setup
+---
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+## 📖 Endpoints
 
-## Important Change with index.php
+### CLIENTE E PRODUTO
+### 1️⃣ Criar um Cliente
+**Rota:** `POST /clientes`
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+#### Exemplo de Body (JSON):
+```json
+{
+    "cpf_cnpj": "12345678901234",
+    "nome_razao_social": "Nome do Cliente"
+}
+```
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+**Resposta esperada:**
+```json
+{
+    "id": 1,
+    "cpf_cnpj": "12345678901234",
+    "nome_razao_social": "Nome do Cliente",
+    "created_at": "2025-03-03T00:00:00",
+    "updated_at": "2025-03-03T00:00:00"
+}
+```
 
-**Please** read the user guide for a better explanation of how CI4 works!
+### 2️⃣ Criar um Produto
+**Rota:** `POST /produtos`
 
-## Repository Management
+#### Exemplo de Body (JSON):
+```json
+{
+    "nome": "Produto Exemplo",
+    "preco_prod": 99.99
+}
+```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+**Resposta esperada:**
+```json
+{
+    "id": 1,
+    "nome": "Produto Exemplo",
+    "preco_prod": 99.99,
+    "created_at": "2025-03-03T00:00:00",
+    "updated_at": "2025-03-03T00:00:00"
+}
+```
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+### PEDIDO
+### 1️⃣ Criar um Pedido
+**Rota:** `POST /pedidos`
 
-## Server Requirements
+**Exemplo de Body (JSON):**
+```json
+{
+    "client_ped": 1,
+    "produtos_ped": [
+        { "produto_id": 2, "quantidade": 1, "preco": 2998.98 },
+        { "produto_id": 1, "quantidade": 1, "preco": 1999.90 }
+    ],
+    "preco_ped": 4998.97,
+    "status": "Em Aberto"
+}
+```
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+**Resposta esperada:**
+```json
+{
+    "status": "Pedido criado com sucesso"
+}
+```
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+### 2️⃣ Listar Todos os Pedidos
+**Rota:** `GET /pedidos`
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+**Resposta esperada:**
+```json
+[
+    {
+        "id": 1,
+        "client_ped": 1,
+        "produtos_ped": [
+            { "produto_id": 2, "quantidade": 1, "preco": 2998.98 },
+            { "produto_id": 1, "quantidade": 1, "preco": 1999.90 }
+        ],
+        "preco_ped": 4998.97,
+        "status": "Em Aberto"
+    }
+]
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+### 3️⃣ Atualizar um Pedido
+**Rota:** `PUT /pedidos/{id}`
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+**Exemplo de Body:**
+```json
+{
+    "status": "Finalizado"
+}
+```
+
+**Resposta esperada:**
+```json
+{
+    "status": "Pedido atualizado com sucesso"
+}
+```
+
+### 4️⃣ Deletar um Pedido
+**Rota:** `DELETE /pedidos/{id}`
+
+**Resposta esperada:**
+```json
+{
+    "status": "Pedido removido com sucesso"
+}
+```
+
+---
